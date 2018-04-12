@@ -36,6 +36,7 @@ void* produce(void *argv){
     int newFlows=(pRawData->length-PKTHEADERSIZE)/FLOWSIZE;
     pthread_mutex_lock(&mutex);
     while(n+newFlows>BLOCKSIZE) pthread_cond_wait(&cond_p,&mutex);
+    if(in==BLOCKSIZE) in=0;
     if((in+newFlows)>BLOCKSIZE){
         memcpy(flowBlock+in,pRawData->buf+PKTHEADERSIZE,(BLOCKSIZE-in)*FLOWSIZE);
         memcpy(flowBlock,pRawData->buf+PKTHEADERSIZE+(BLOCKSIZE-in)*FLOWSIZE,(newFlows-(BLOCKSIZE-in))*FLOWSIZE);
@@ -63,6 +64,7 @@ void *produceFromFile(void *arg){
         int readNum=0;
         pthread_mutex_lock(&mutex);
         while(n+newFlows>BLOCKSIZE) pthread_cond_wait(&cond_p,&mutex);
+        if(in==BLOCKSIZE) in=0;
         if((in+newFlows)>BLOCKSIZE){
             readNum=fread(flowBlock+in,FLOWSIZE,BLOCKSIZE-in,fp);
             readNum+=fread(flowBlock,FLOWSIZE,(newFlows-(BLOCKSIZE-in)),fp);
