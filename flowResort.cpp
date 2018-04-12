@@ -84,7 +84,12 @@ void insertFlowsToBucket(flowRecord rec,int index){
 void exportResortedFlows(int index){
     flowRecordNode *pF;
     pF=&hashTable[index].head;
-    unusedChainTail->next=pF->next;
+    //unusedChainTail->next=pF->next;
+    if(unusedChainHead==NULL){
+        unusedChainHead=pF->next;
+    }else{
+        unusedChainTail->next=pF->next;
+    }
     int j;
     for(j=0;j<FLOWSPERPROCESS;j++){
         pF=pF->next;
