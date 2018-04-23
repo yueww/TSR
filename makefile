@@ -1,6 +1,6 @@
-test : produceFlows.o lsh.o flowResort.o index.o myToolFunc.o compressIndex.o \
+testStorage : produceFlows.o lsh.o flowResort.o index.o myToolFunc.o compressIndex.o \
 	exportDataAndIndex.o processFlows.o test.o
-	g++ -o test -g produceFlows.o lsh.o flowResort.o index.o myToolFunc.o\
+	g++ -o testStorage -g produceFlows.o lsh.o flowResort.o index.o myToolFunc.o\
 		compressIndex.o exportDataAndIndex.o processFlows.o test.o -lpthread
 produceFlows.o : produceFlows.c produceFlows.h common.h 
 	g++ -c -g produceFlows.c
@@ -9,7 +9,7 @@ processFlows.o : processFlows.c processFlows.h common.h trieIndex.h
 lsh.o : lsh.cpp lsh.h common.h
 	g++ -std=c++11 -c -g lsh.cpp
 flowResort.o : flowResort.cpp flowResort.h lsh.h common.h
-	g++ -std=c++11 -c -g lsh.cpp flowResort.cpp
+	g++ -std=c++11 -c -g flowResort.cpp
 index.o : index.cpp index.h trieIndex.h common.h
 	g++ -c -g index.cpp
 myToolFunc.o : myToolFunc.c myToolFunc.h
@@ -17,8 +17,8 @@ myToolFunc.o : myToolFunc.c myToolFunc.h
 compressIndex.o : compressIndex.cpp compressIndex.h common.h trieIndex.h
 	g++ -c -g compressIndex.cpp
 exportDataAndIndex.o : exportDataAndIndex.cpp exportDataAndIndex.h common.h trieIndex.h myToolFunc.h
-	g++ -c -g myToolFunc.c exportDataAndIndex.cpp
+	g++ -c -g exportDataAndIndex.cpp
 test.o : test.c test.h common.h trieIndex.h lsh.h
-	g++ -std=c++11 -c -g lsh.cpp test.c
+	g++ -std=c++11 -c -g test.c
 clean :
-	rm *.o test 
+	rm *.o testStorage 
