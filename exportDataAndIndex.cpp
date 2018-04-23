@@ -60,7 +60,7 @@ int exportIpIndexFile(innerNode *rootNode,int flag){
         q.pop();
     } 
     int base=sizeof(trieNodeOffset)*trieNodeNum;
-    printf("trie node consume %d bytes!\n",base);
+    //printf("trie node consume %d bytes!\n",base);
     while(!q.empty()){
         pNode=q.front();
         for(i=0;i<256;i++){
