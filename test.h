@@ -10,13 +10,23 @@
 #include "common.h"
 #include "trieIndex.h"
 #include "lsh.h"
+#include "mysql/mysql.h"
 
 #define TABLESIZE 1024
 #define COMMANDSIZE 512
 #define LINKNODEBUFSIZE TABLESIZE*FLOWSPERPROCESS
 
+char host[256];
+char user[128];
+char password[128];
+char database[128];
+unsigned port;
+MYSQL mysql;
+bool useDb=false;
+
 int shmid;
 void *shmptr;
+
 pthread_t pro,con;
 
 

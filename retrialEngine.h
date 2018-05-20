@@ -10,6 +10,7 @@
 #include "common.h"
 #include "myToolFunc.h"
 #include "termios.h"
+#include "mysql/mysql.h"
 #include <queue>
 
 using namespace std;
@@ -48,14 +49,17 @@ int retrialIpCompressedIndex(const char *path,byte ip[],unsigned *compressedInde
 int retrialPortCompressedIndex(const char *path,unsigned port,unsigned *compressedIndexBuf);
 int decompressIndex(unsigned *compressedIndexBuf,int compressLen,unsigned *decompressedIndexBuf);
 int retrialFlows(const char *path,unsigned *decompressedIndexBuf,int decompressLen);
-void formatShow(const char *path,char *opt);
+void clearQueue();
+void formatShow(const char *path,char *opt,const char *command);
 int getQueryFileSet(bool flag[]);
+int getQueryFileSet(MYSQL *mysgl,bool flag[],const char *startTime,const char *endTime);
 int convertIpStrToByteArr(char *ipStr,byte ip[]);
 int convertPortStrToByteArr(char *portStr);
 int strToi(char *str);
 unsigned long getFileSize(const char *path);
 char *formatIp(byte *ip);
 char *formatTime(byte *time);
+int getQueryTime(const char *raw,char *formated);
 unsigned short formatPort(byte *port);
 unsigned formatStatis(byte *statis);
 void bToStr(char str[],byte num);

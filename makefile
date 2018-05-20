@@ -1,7 +1,7 @@
 testStorage : produceFlows.o lsh.o flowResort.o index.o myToolFunc.o compressIndex.o \
 	exportDataAndIndex.o processFlows.o test.o
 	g++ -o testStorage -g produceFlows.o lsh.o flowResort.o index.o myToolFunc.o\
-		compressIndex.o exportDataAndIndex.o processFlows.o test.o -lpthread
+		compressIndex.o exportDataAndIndex.o processFlows.o test.o -lpthread -lmysqlclient
 produceFlows.o : produceFlows.c produceFlows.h common.h 
 	g++ -c -g produceFlows.c
 processFlows.o : processFlows.c processFlows.h common.h trieIndex.h

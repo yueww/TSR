@@ -121,3 +121,11 @@ int iToStr(int num,char str[]){
     }
     return 0;
 }
+
+void getNowTime(char formatTime[],int len){
+    time_t now;
+    struct tm *tm_now;
+    time(&now);
+    tm_now=localtime(&now);
+    strftime(formatTime,len,"%Y-%m-%d %H:%M:%S",tm_now);
+}

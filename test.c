@@ -78,6 +78,34 @@ int main(int argc,char *argv[]){
         printf("not enough arguments!\n");
         exit(0);
     }
+    if(argc==4){
+        if(strcmp(argv[3],"-t")==0){
+            printf("please input host:");
+            scanf("%s",host);
+            printf("please input user:");
+            scanf("%s",user);
+            printf("please input password:");
+            scanf("%s",password);
+            printf("please input database:");
+            scanf("%s",database);
+            printf("please input port:");
+            scanf("%u",&port);
+            fflush(stdin);
+            mysql_init(&mysql);
+            if(!mysql_real_connect(&mysql,host,user,password,database,port,NULL,0)){
+                printf("mysql_real_connect failed!\n");
+                return 0;
+            }
+            useDb=true;
+        }else{
+            printf("unknown option:%s\n",argv[3]);
+            return 0;
+        }
+    }
+    if(argc>4){
+        printf("too much arguments!\n");
+        return 0;
+    }
     /*
     set a share memory,use it to check whether export process is running. 
     */
@@ -247,6 +275,7 @@ int main(int argc,char *argv[]){
         } 
         free(exportRes);
     }
+    mysql_close(&mysql);
     return 0;
 }
 

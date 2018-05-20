@@ -8,12 +8,25 @@
 #include "exportDataAndIndex.h"
 
 int* exportDataAndIndex(){
+    char formatTime[128];
+    char query[512];
+    if(useDb==true){
+        getNowTime(formatTime,128);
+    }
     int *exportRes=(int *)malloc(sizeof(int)*5);
     exportRes[0]=exportDataFile();
     exportRes[1]=exportIpIndexFile(srcIpRootNode,1);
     exportRes[2]=exportIpIndexFile(dstIpRootNode,2);
     exportRes[3]=exportPortIndexFile(&srcPortIndexTable,1);
     exportRes[4]=exportPortIndexFile(&dstPortIndexTable,2);
+    if(useDb==true){
+        sprintf(query,"INSERT INTO tsr(data_file,src_ip_index_file,src_port_index_file,dst_ip_index_file,\
+            dst_port_index_file,timestamp)values('%s','%s','%s','%s','%s','%s')",dateFileName,\
+            srcIpIndexFileName,srcPortIndexFileName,dstIpIndexFileName,dstPortIndexFileName,formatTime);
+        if(mysql_real_query(&mysql,query,(unsigned long)strlen(query))){
+            printf("mysql_real_query failed!\n");
+        }
+    }
     return exportRes;
 }
 

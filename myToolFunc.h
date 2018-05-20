@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include "dirent.h"
 #include "sys/stat.h"
+#include <time.h>
 
 #define MAXARGSNUM 16
 
@@ -23,5 +24,6 @@
 //int splitStr(const char *str,char *(*res)[]);
 int countFiles(const char *path,const char *filter);
 int iToStr(int num,char str[]);
+void getNowTime(char formatTime[],int len);
 
 #endif

@@ -226,18 +226,19 @@ int retrialFlows(const char *path,unsigned *decompressedIndexBuf,int decompressL
 }
 
 
-void formatShow(const char *path,char *opt){
+void formatShow(const char *path,char *opt,const char *command){
     int rfd=open(path,O_RDONLY);
     if(rfd==-1){
         printf("fail to open raw retrialRes file!\n");
         return;
     }
     if(!strcmp(opt,"-q")){
-        FILE *fp=fopen("./formatRetrialRes","w");
+        FILE *fp=fopen("./formatRetrialRes","a+");
         if(fp==NULL){
             printf("fail to open format result file!\n");
             return;
         }
+        fprintf(fp,"retrial command:%s\n",command);
         fprintf(fp,"          srcIp srcPort           dstIp dstPort proto       pkts       octs        firstTime         lastTime\n");
         unsigned long size=getFileSize(path);
         if(size==-1){
@@ -493,4 +494,140 @@ int getQueryFileSet(bool flag[]){
         queryFileSet.push(pqf);
     }
     return num;
+}
+
+int getQueryFileSet(MYSQL *mysql,bool flag[],const char *startTime,const char *endTime){
+    int num=0;    
+    MYSQL_RES *res;
+    MYSQL_ROW row;
+    char query1[512];
+    sprintf(query1,"SELECT data_file,src_ip_index_file,src_port_index_file,dst_ip_index_file,\
+            dst_port_index_file FROM tsr WHERE timestamp > '%s' AND timestamp <= '%s'",\
+            startTime,endTime);
+    if(mysql_real_query(mysql,query1,(unsigned long)strlen(query1))){
+        printf("mysql_real_query failed!\n");
+        return -1;
+    }
+    res=mysql_store_result(mysql);
+    if(res==NULL){
+        printf("mysql_store_result failed!\n");
+        return -1;
+    }
+    while(row=mysql_fetch_row(res)){
+        pQueryFile pqf=new queryFile();
+        pqf->dataFileName=new char[48];
+        strcpy(pqf->dataFileName,row[0]);
+        if(flag[0]){
+            pqf->srcIpIndexFileName=new char[48];
+            strcpy(pqf->srcIpIndexFileName,row[1]);
+        }
+        if(flag[1]){
+            pqf->srcPortIndexFileName=new char[48];
+            strcpy(pqf->srcPortIndexFileName,row[2]);
+        }
+        if(flag[2]){
+            pqf->dstIpIndexFileName=new char[48];
+            strcpy(pqf->dstIpIndexFileName,row[3]);
+        }
+        if(flag[3]){
+            pqf->dstPortIndexFileName=new char[48];
+            strcpy(pqf->dstPortIndexFileName,row[4]);
+        }
+        queryFileSet.push(pqf);
+        num++;
+    }
+    mysql_free_result(res);
+    if(num==0){
+        char query2[512];
+        sprintf(query2,"SELECT data_file,src_ip_index_file,src_port_index_file,dst_ip_index_file,\
+            dst_port_index_file FROM orders WHERE timestamp > '%s' ORDER BY timestamp LIMIT 1",\
+            endTime);
+        if(mysql_real_query(mysql,query2,(unsigned long)strlen(query2))){
+            printf("mysql_real_query failed!\n");
+            return -1;
+        }
+        res=mysql_store_result(mysql);
+        if(res==NULL){
+            printf("mysql_store_result failed!\n");
+            return -1;
+        }
+        if(row=mysql_fetch_row(res)){
+            pQueryFile pqf=new queryFile();
+            pqf->dataFileName=new char[48];
+            strcpy(pqf->dataFileName,row[0]);
+            if(flag[0]){
+                pqf->srcIpIndexFileName=new char[48];
+                strcpy(pqf->srcIpIndexFileName,row[1]);
+            }
+            if(flag[1]){
+                pqf->srcPortIndexFileName=new char[48];
+                strcpy(pqf->srcPortIndexFileName,row[2]);
+            }
+            if(flag[2]){
+                pqf->dstIpIndexFileName=new char[48];
+                strcpy(pqf->dstIpIndexFileName,row[3]);
+            }
+            if(flag[3]){
+                pqf->dstPortIndexFileName=new char[48];
+                strcpy(pqf->dstPortIndexFileName,row[4]);
+            }
+            queryFileSet.push(pqf);
+            num++;
+        }
+        mysql_free_result(res);
+    }
+    //mysql_close(&mysql);
+    return num;
+}
+
+void clearQueue(){
+    while(!queryFileSet.empty()){
+        pQueryFile pqf=queryFileSet.front();
+        if(pqf->dataFileName) delete pqf->dataFileName;
+        if(pqf->srcIpIndexFileName) delete pqf->srcIpIndexFileName;
+        if(pqf->srcPortIndexFileName) delete pqf->srcPortIndexFileName;
+        if(pqf->dstIpIndexFileName) delete pqf->dstIpIndexFileName;
+        if(pqf->dstPortIndexFileName) delete pqf->dstPortIndexFileName;
+        delete pqf;
+        queryFileSet.pop();
+    }    
+}
+
+int getQueryTime(const char *raw,char *formated){
+    time_t now;
+    struct tm *tm_now;
+    time(&now);
+    tm_now=localtime(&now);
+    int len=strlen(raw);
+    if(len==19){
+        memcpy(formated,raw,19);
+    }else if(len==14){
+        strftime(formated,48,"%Y-",tm_now);
+        memcpy(formated+5,raw,14);
+    }else if(len==8){
+        strftime(formated,48,"%Y-%m-%d ",tm_now);
+        memcpy(formated+11,raw,8);
+    }else if(len==10){
+        if(!strchr(raw,':')){
+            memcpy(formated,raw,10);
+            memcpy(formated+10," 00:00:00",9);
+        }else{
+            formated[0]=0;
+            return -1;
+        }
+    }else if(len==5){
+        if(!strchr(raw,':')){
+            strftime(formated,48,"%Y-",tm_now);
+            memcpy(formated+5,raw,5);
+            memcpy(formated+10," 00:00:00",9);
+        }else{
+            formated[0]=0;
+            return -1;
+        }
+    }else{
+        formated[0]=-1;
+        return -1;
+    }
+    formated[19]='\0';
+    return len;
 }

@@ -10,6 +10,7 @@
 #include "common.h"
 #include "myToolFunc.h"
 #include "trieIndex.h"
+#include "mysql/mysql.h"
 #include <queue>
 
 using namespace std;
@@ -39,6 +40,16 @@ extern portIndexTable dstPortIndexTable;
 extern int outBase;
 extern unsigned compressedIndexArr[];
 extern int indexOffset;
+
+/*
+extern char host[];
+extern char user[];
+extern char password[];
+extern char database[];
+extern unsigned port;
+*/
+extern MYSQL mysql;
+extern bool useDb;
 
 char dateFileName[32];
 char srcIpIndexFileName[32];
