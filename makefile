@@ -1,8 +1,10 @@
-testStorage : produceFlows.o lsh.o flowResort.o index.o myToolFunc.o compressIndex.o \
+testStorage : yyThreadPool.o produceFlows.o lsh.o flowResort.o index.o myToolFunc.o compressIndex.o \
 	exportDataAndIndex.o processFlows.o test.o
-	g++ -o testStorage -g produceFlows.o lsh.o flowResort.o index.o myToolFunc.o\
+	g++ -o testStorage -g yyThreadPool.o produceFlows.o lsh.o flowResort.o index.o myToolFunc.o\
 		compressIndex.o exportDataAndIndex.o processFlows.o test.o -lpthread -lmysqlclient
-produceFlows.o : produceFlows.c produceFlows.h common.h 
+yyThreadPool.o : yyThreadPool.c yyThreadPool.h
+	g++ -c -g yyThreadPool.c 
+produceFlows.o : produceFlows.c produceFlows.h common.h yyThreadPool.h
 	g++ -c -g produceFlows.c
 processFlows.o : processFlows.c processFlows.h common.h trieIndex.h
 	g++ -std=c++11 -c -g processFlows.c
@@ -18,7 +20,7 @@ compressIndex.o : compressIndex.cpp compressIndex.h common.h trieIndex.h
 	g++ -c -g compressIndex.cpp
 exportDataAndIndex.o : exportDataAndIndex.cpp exportDataAndIndex.h common.h trieIndex.h myToolFunc.h
 	g++ -c -g exportDataAndIndex.cpp
-test.o : test.c test.h common.h trieIndex.h lsh.h
+test.o : test.c test.h common.h yyThreadPool.h trieIndex.h lsh.h
 	g++ -std=c++11 -c -g test.c
 clean :
 	rm *.o testStorage 

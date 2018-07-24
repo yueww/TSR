@@ -7,8 +7,20 @@
 
 #include "produceFlows.h"
 
+void cleanup(void *arg){
+    threadpool_t *pThreadPool=(threadpool_t *)arg;
+    if((pThreadPool->tasks).qmutex.__data.__owner==syscall(SYS_gettid)){
+        pthread_mutex_unlock(&((pThreadPool->tasks).qmutex));
+    }
+    if((((pThreadPool->tasks).has_tasks)->mut).__data.__owner==syscall(SYS_gettid)){
+        pthread_mutex_unlock(&(((pThreadPool->tasks).has_tasks)->mut));
+    }
+}
+
 void *receiveData(void *argv){
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS,NULL);
+    pThreadPool=threadpool_init(4,rDataCacheSize);
+    pthread_cleanup_push(cleanup,(void *)pThreadPool);
     int sockfd;
     struct sockaddr_in servaddr;
     sockfd=socket(AF_INET,SOCK_DGRAM,0);
@@ -21,13 +33,15 @@ void *receiveData(void *argv){
         printf("bind failed!\n");
         pthread_exit(0);
     }
-    int count=0;
+    long long  count=0;
     pthread_t tid;
     while(1){
         rDataCache[count%rDataCacheSize].length=recvfrom(sockfd,rDataCache[count%rDataCacheSize].buf,BUFSIZE,0,0,0);
-        pthread_create(&tid,0,produce,(void *)&rDataCache[count%rDataCacheSize]);
+        //pthread_create(&tid,0,produce,(void *)&rDataCache[count%rDataCacheSize]);
+        threadpool_add_task(pThreadPool,produce,(void *)&rDataCache[count%rDataCacheSize]);
         count++;
     }
+    pthread_cleanup_pop(0);
 }
 
 void* produce(void *argv){

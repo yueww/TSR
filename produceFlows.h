@@ -8,9 +8,11 @@
 #ifndef _PRODUCEFLOWS_H
 #define _PRODUCEFLOWS_H
 
+#include <sys/syscall.h>
 #include "common.h"
+#include "yyThreadPool.h"
 
-#define rDataCacheSize 5
+#define rDataCacheSize 16
 
 typedef struct rawData{
     unsigned length;
@@ -19,6 +21,7 @@ typedef struct rawData{
 
 unsigned in;
 int n;
+threadpool_t *pThreadPool;
 pthread_mutex_t mutex;
 pthread_cond_t cond_p;
 

@@ -8,6 +8,7 @@
 #ifndef _TEST_H
 #define _TEST_H
 #include "common.h"
+#include "yyThreadPool.h"
 #include "trieIndex.h"
 #include "lsh.h"
 #include "mysql/mysql.h"
@@ -29,7 +30,7 @@ void *shmptr;
 
 pthread_t pro,con;
 
-
+extern threadpool_t *pThreadPool;
 //extern vector<double> aVecParas[HASHFUNCNUM];
 //extern double bParas[HASHFUNCNUM];
 extern hashBucket hashTable[TABLESIZE];

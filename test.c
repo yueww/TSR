@@ -181,6 +181,7 @@ int main(int argc,char *argv[]){
         if(canRes!=0){
             printf("fail to cancel process which receive flows!\n");
         }
+        threadpool_destroy(pThreadPool);
         canRes=pthread_cancel(con);
         if(canRes!=0){
             printf("fail to cancel process which index flows!\n");
