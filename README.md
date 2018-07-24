@@ -11,24 +11,39 @@ NOTE:
   two fields,you can modify the source code before you compile it.
 
 TSR is consist of two parts:storage module and retrial module.
-storage command:sudo ./test opt name
+storage module setup command:sudo ./test opt name [-t]
 opt:
     -i:correspond to interface name
     -f:correspond to pcap file name
+name: interface name or pcap file name
+-t: this option is optional.when you use this option,it means you want to use DB to manage the index file
+and data file,DB will record the timestamp info of file,so you can specify the time block in retrial. 
 NOTE:
     1.opt is essential
     2.storage result is stored in the dataDir/ and index/
+    3.make sure you have installed mysql and created corresponding database before you use option -t.
 
-retrial command:sudo ./testRetrial opt indexname indexvalue
+retrial module setup command:sudo ./testRetrial [-t]
+-t:you can specify the time block in retrial command when you use this option.
+
+retrial command: retrieve opt retrialExpression [-s startTime] [-e endTime]
+example: retrieve -p -s 2018-03-01 10:10:10 -e 2018-03-01 10:10:20 srcIp==192.168.1.1 && dstPort==80 
 opt:
     -p:print format result on the screen besides raw result
     -q:store format result in the file besides raw result
-indexname:
+retrialExpression:
+    support four index fields and three operators
+index field:
     srcIp
     srcPort
     dstIp
     dstPort
-NOTE:
+operator:
+    == && || ()
+startTime or endTime:year-month-day hour:minute:second.
+if you do not specify date or year,the date will be current date.if you do not specify time, the time will be 00:00:00 in startTime,23:59:59 in endTime.for example,if current date is 2018-03-01,then 12:00:00 means 2018-03-01 12:00:00,03-01 12:00:00 means2018-03-01 12:00:00 too.2018-03-01 means 2018-03-01 00:00:00 in startTime,2018-03-01 23:59:59 in endTime
+
+NOTE: 
     1.opt is not essential
     2.retrial result is stored in the result/
 
